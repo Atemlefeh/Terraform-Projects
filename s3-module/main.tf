@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "private" {
-  bucket = "example-private-bucket"
+  bucket = "ajc-bucket"    #example-private-bucket
   acl = "private"
   versioning {
     enabled = true
@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "private" {
   }
   lifecycle {
     rule {
-      id      = "example-rule"
+      id      = "ajc-rule"
       status  = "Enabled"
       prefix  = ""
       tags    = {}
@@ -83,23 +83,23 @@ resource "aws_kms_alias" "kms_s3_key_alias" {
 ########################
 # Bucket creation
 ########################
-resource "aws_s3_bucket" "my_protected_bucket" {
+resource "aws_s3_bucket" "ajc_bucket" {
   bucket = var.bucket_name
 }
 
 ##########################
 # Bucket private access
 ##########################
-resource "aws_s3_bucket_acl" "my_protected_bucket_acl" {
-  bucket = aws_s3_bucket.my_protected_bucket.id
+resource "aws_s3_bucket_acl" "ajc_bucket_acl" {
+  bucket = aws_s3_bucket.ajc_bucket.id
   acl    = "private"
 }
 
 #############################
 # Enable bucket versioning
 #############################
-resource "aws_s3_bucket_versioning" "my_protected_bucket_versioning" {
-  bucket = aws_s3_bucket.my_protected_bucket.id
+resource "aws_s3_bucket_versioning" "ajc_bucket_versioning" {
+  bucket = aws_s3_bucket.ajc_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
@@ -108,8 +108,8 @@ resource "aws_s3_bucket_versioning" "my_protected_bucket_versioning" {
 #################################
 # Enable server access logging
 #################################
-resource "aws_s3_bucket_logging" "my_protected_bucket_logging" {
-  bucket = aws_s3_bucket.my_protected_bucket.id
+resource "aws_s3_bucket_logging" "ajc_bucket_logging" {
+  bucket = aws_s3_bucket.ajc_bucket.id
 
   target_bucket = var.access_logging_bucket_name
   target_prefix = "${var.bucket_name}/"
@@ -118,8 +118,8 @@ resource "aws_s3_bucket_logging" "my_protected_bucket_logging" {
 ##########################################
 # Enable default Server Side Encryption
 ##########################################
-resource "aws_s3_bucket_server_side_encryption_configuration" "my_protected_bucket_server_side_encryption" {
-  bucket = aws_s3_bucket.my_protected_bucket.bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "ajc_bucket_sse" {
+  bucket = aws_s3_bucket.ajc_bucket.bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -129,14 +129,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "my_protected_buck
   }
 }
 
-############################
 # Creating Lifecycle Rule
 ############################
-resource "aws_s3_bucket_lifecycle_configuration" "my_protected_bucket_lifecycle_rule" {
+resource "aws_s3_bucket_lifecycle_configuration" "ajc_bucket_lifecycle_rule" {
   # Must have bucket versioning enabled first
-  depends_on = [aws_s3_bucket_versioning.my_protected_bucket_versioning]
+  depends_on = [aws_s3_bucket_versioning.ajc_bucket_versioning]
 
-  bucket = aws_s3_bucket.my_protected_bucket.bucket
+  bucket = aws_s3_bucket.ajc_bucket.bucket
 
   rule {
     id = "basic_config"
@@ -166,8 +165,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "my_protected_bucket_lifecycle_
 # Disabling bucket
 # public access
 ########################
-resource "aws_s3_bucket_public_access_block" "my_protected_bucket_access" {
-  bucket = aws_s3_bucket.my_protected_bucket.id
+resource "aws_s3_bucket_public_access_block" "ajc_bucket_access" {
+  bucket = aws_s3_bucket.ajc_bucket.id
 
   # Block public access
   block_public_acls   = true
