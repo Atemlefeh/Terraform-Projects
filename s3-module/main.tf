@@ -1,63 +1,14 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_s3_bucket" "private" {
-  bucket = "ajc-bucket"    #example-private-bucket
-  acl = "private"
-  versioning {
-    enabled = true
-  }
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = "alias/aws/s3"
-        sse_algorithm = "aws:kms"
-      }
-    }
-  }
-  lifecycle {
-    rule {
-      id      = "ajc-rule"
-      status  = "Enabled"
-      prefix  = ""
-      tags    = {}
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-      expiration {
-        days = 60
-      }
-    }
-  }
-  object_lock_configuration {
-    object_lock_enabled = "Enabled"
-    rule {
-      default_retention {
-        mode = "GOVERNANCE"
-        days = 30
-      }
-    }
-  }
-  backend {
-    type = "s3"
-    bucket = "example-terraform-state-bucket"
-    key    = "example-private-bucket/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
 #################################################################
 
 terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0.0"
+    #  version = "~> 4.0.0"
     }
   }
 
-  required_version = ">= 0.15"
+ # required_version = ">= 0.15"
 }
 
 provider "aws" {
@@ -65,7 +16,6 @@ provider "aws" {
   region  = var.aws_region
 }
 
-###########################
 # Customer managed KMS key
 ###########################
 resource "aws_kms_key" "kms_s3_key" {
@@ -80,14 +30,12 @@ resource "aws_kms_alias" "kms_s3_key_alias" {
     target_key_id = aws_kms_key.kms_s3_key.key_id
 }
 
-########################
 # Bucket creation
 ########################
 resource "aws_s3_bucket" "ajc_bucket" {
   bucket = var.bucket_name
 }
 
-##########################
 # Bucket private access
 ##########################
 resource "aws_s3_bucket_acl" "ajc_bucket_acl" {
@@ -95,7 +43,6 @@ resource "aws_s3_bucket_acl" "ajc_bucket_acl" {
   acl    = "private"
 }
 
-#############################
 # Enable bucket versioning
 #############################
 resource "aws_s3_bucket_versioning" "ajc_bucket_versioning" {
@@ -105,7 +52,6 @@ resource "aws_s3_bucket_versioning" "ajc_bucket_versioning" {
   }
 }
 
-#################################
 # Enable server access logging
 #################################
 resource "aws_s3_bucket_logging" "ajc_bucket_logging" {
@@ -115,7 +61,6 @@ resource "aws_s3_bucket_logging" "ajc_bucket_logging" {
   target_prefix = "${var.bucket_name}/"
 }
 
-##########################################
 # Enable default Server Side Encryption
 ##########################################
 resource "aws_s3_bucket_server_side_encryption_configuration" "ajc_bucket_sse" {
@@ -161,7 +106,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "ajc_bucket_lifecycle_rule" {
   }
 }
 
-########################
 # Disabling bucket
 # public access
 ########################
