@@ -16,21 +16,21 @@ provider "aws" {
   region  = var.aws_region
 }
 
-resource "aws_kms_key" "mykey" {
+resource "aws_kms_key" "ajckey" {
   description             = "This key is used to encrypt bucket objects"
   deletion_window_in_days = 10
 }
 
-resource "aws_s3_bucket" "mybucket" {
-  bucket = "mybucket"
+resource "aws_s3_bucket" "ajcbucket" {
+  bucket = "bootcamp30_ajc"
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
-  bucket = aws_s3_bucket.mybucket.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "ajc-sse" {
+  bucket = aws_s3_bucket.ajcbucket.id
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.mykey.arn
+      kms_master_key_id = aws_kms_key.ajckey.arn
       sse_algorithm     = "aws:kms"
     }
   }
