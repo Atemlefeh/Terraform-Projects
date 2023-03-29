@@ -10,8 +10,3 @@ variable "bucket_name" {
   default     = "ajc-bucket"
 }
 
-variable "access_logging_bucket_name" {
-  description = "S3 bucket name for access logging"
-  type        = string
-  default     = "ajc-logging-bucket"
-}
